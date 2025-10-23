@@ -1,6 +1,6 @@
 package br.com.saga_orquestrado.payment.core.dto;
 
-import br.com.saga_orquestrado.product_validation.core.enums.ESagaStatus;
+import br.com.saga_orquestrado.payment.core.enums.ESagaStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
