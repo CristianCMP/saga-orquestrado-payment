@@ -1,7 +1,5 @@
 package br.com.saga_orquestrado.payment.config.exception;
 
-import br.com.saga_orquestrado.order.config.exception.ExceptionDetails;
-import br.com.saga_orquestrado.order.config.exception.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
