@@ -46,7 +46,6 @@ public class PaymentService {
         producer.sendEvent(jsonUtil.toJson(event));
     }
 
-
     private void checkCurrentValidation(Event event) {
         if (paymentRepository.existsByOrderIdAndTransactionId(event.getPayload().getId(), event.getPayload().getTransactionId())) {
             throw new ValidationException("There's another transactionId for this validation.");
