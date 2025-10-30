@@ -5,7 +5,6 @@ import br.com.saga_orquestrado.payment.core.dto.Event;
 import br.com.saga_orquestrado.payment.core.dto.History;
 import br.com.saga_orquestrado.payment.core.dto.OrderProducts;
 import br.com.saga_orquestrado.payment.core.enums.EPaymentStatus;
-import br.com.saga_orquestrado.payment.core.enums.ESagaStatus;
 import br.com.saga_orquestrado.payment.core.model.Payment;
 import br.com.saga_orquestrado.payment.core.producer.KafkaProducer;
 import br.com.saga_orquestrado.payment.core.repository.PaymentRepository;
@@ -129,11 +128,16 @@ public class PaymentService {
     }
 
     public void realizeRefund(Event event) {
-        changePaymentStatusToRefund(event);
-
         event.setStatus(FAIL);
         event.setSource(CURRENT_SOURCE);
-        addHistory(event, "Rollback executed for payment!");
+
+        try {
+            changePaymentStatusToRefund(event);
+            addHistory(event, "Rollback executed for payment!");
+        } catch (Exception ex) {
+            addHistory(event, "Rollback not executed for payment: ".concat(ex.getMessage()));
+        }
+
         producer.sendEvent(jsonUtil.toJson(event));
     }
 
