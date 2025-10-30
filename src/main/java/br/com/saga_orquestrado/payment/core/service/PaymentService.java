@@ -41,7 +41,7 @@ public class PaymentService {
             handleSuccess(event);
         } catch (Exception ex) {
             log.error("Error trying to make payment: ", ex);
-//            handleFailCurrentNotExecuted(event, ex.getMessage());
+            handleFailCurrentNotExecuted(event, ex.getMessage());
         }
 
         producer.sendEvent(jsonUtil.toJson(event));
@@ -120,6 +120,28 @@ public class PaymentService {
                 .build();
 
         event.addToHistory(history);
+    }
+
+    private void handleFailCurrentNotExecuted(Event event, String message) {
+        event.setStatus(ROLLBACK_PENDING);
+        event.setSource(CURRENT_SOURCE);
+        addHistory(event, "Fail to realized payment: ".concat(message));
+    }
+
+    public void realizeRefund(Event event) {
+        changePaymentStatusToRefund(event);
+
+        event.setStatus(FAIL);
+        event.setSource(CURRENT_SOURCE);
+        addHistory(event, "Rollback executed for payment!");
+        producer.sendEvent(jsonUtil.toJson(event));
+    }
+
+    private void changePaymentStatusToRefund(Event event) {
+        var payment = findByOrderIdAndTransactionId(event);
+        payment.setStatus(EPaymentStatus.REFUND);
+        setEventAmountItems(event, payment);
+        save(payment);
     }
 
     private Payment findByOrderIdAndTransactionId(Event event) {
